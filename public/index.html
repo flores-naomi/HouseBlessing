@@ -520,6 +520,12 @@
     }
 
     loadSummary();
+
+    window.addEventListener('storage', event => {
+      if (event.key === 'rsvp-updated') {
+        loadSummary();
+      }
+    });
   </script>
 </body>
 </html>

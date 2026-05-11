@@ -112,6 +112,23 @@ app.get('/api/rsvps', (req, res) => {
   res.json({ total_families: rsvps.length, total_attendees: total, rsvps: decryptedRsvps });
 });
 
+// Delete RSVP
+app.delete('/api/rsvp/:id', (req, res) => {
+  const secret = req.query.secret;
+  if (secret !== (process.env.ADMIN_SECRET || 'bless2025')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const id = req.params.id;
+  const existing = db.get('rsvps').find({ id }).value();
+  if (!existing) {
+    return res.status(404).json({ error: 'RSVP not found.' });
+  }
+
+  db.get('rsvps').remove({ id }).write();
+  res.json({ success: true });
+});
+
 // Public summary
 app.get('/api/summary', (req, res) => {
   const rsvps   = db.get('rsvps').value();

@@ -97,24 +97,20 @@
       cursor: pointer;
       transition: background .2s;
     }
-    .export-btn:hover { background: rgba(184,146,74,.08); }
-
-    .logout-btn {
-      padding: 8px 16px;
-      background: var(--white);
-      color: var(--brown);
-      border: none;
+    .delete-btn {
+      padding: 8px 12px;
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
       border-radius: 3px;
       font-family: 'Jost', sans-serif;
-      font-size: .75rem;
-      letter-spacing: .08em;
-      text-transform: uppercase;
+      font-size: .8rem;
       cursor: pointer;
-      transition: background .2s;
+      transition: background .2s, border-color .2s;
     }
-    .logout-btn:hover { background: rgba(255,255,255,.8); }
+    .delete-btn:hover { background: #f1b0b7; border-color: #f1b0b7; }
+    .action-cell { width: 110px; }
 
-    .empty { text-align: center; padding: 48px; color: var(--muted); font-style: italic; }
   </style>
 </head>
 <body>
@@ -151,6 +147,7 @@
         <th>Count</th>
         <th>Message</th>
         <th>Submitted</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody id="rsvp-tbody"></tbody>
@@ -202,6 +199,7 @@
           <td><span class="badge">${r.attendee_count}</span></td>
           <td class="msg-text">${r.message ? esc(r.message) : '<span style="opacity:.4">—</span>'}</td>
           <td class="ts">${new Date(r.created_at).toLocaleString()}</td>
+          <td class="action-cell"><button class="delete-btn" onclick="deleteRsvp('${r.id}')">Delete</button></td>
         </tr>
       `).join('');
     } catch (e) {
@@ -233,6 +231,22 @@
     a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
     a.download = 'rsvps.csv';
     a.click();
+  }
+
+  async function deleteRsvp(id) {
+    if (!confirm('Delete this RSVP? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/rsvp/${id}?secret=${encodeURIComponent(currentSecret)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || 'Could not delete RSVP.');
+        return;
+      }
+      localStorage.setItem('rsvp-updated', Date.now());
+      loadData();
+    } catch (e) {
+      alert('Network error. Please try again.');
+    }
   }
 
   function logout() {
