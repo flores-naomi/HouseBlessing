@@ -99,6 +99,21 @@
     }
     .export-btn:hover { background: rgba(184,146,74,.08); }
 
+    .logout-btn {
+      padding: 8px 16px;
+      background: var(--white);
+      color: var(--brown);
+      border: none;
+      border-radius: 3px;
+      font-family: 'Jost', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,.8); }
+
     .empty { text-align: center; padding: 48px; color: var(--muted); font-style: italic; }
   </style>
 </head>
@@ -106,7 +121,10 @@
 
 <div class="header">
   <h1>🏠 House Blessing — RSVPs</h1>
-  <span>Admin Dashboard</span>
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <span>Admin Dashboard</span>
+    <button class="logout-btn" id="logout-btn" onclick="logout()" style="display: none;">Logout</button>
+  </div>
 </div>
 
 <div id="login-wrap" class="login-wrap">
@@ -165,6 +183,7 @@
 
       document.getElementById('login-wrap').style.display = 'none';
       document.getElementById('admin-wrap').style.display = 'block';
+      document.getElementById('logout-btn').style.display = 'block';
 
       document.getElementById('s-families').textContent = data.total_families;
       document.getElementById('s-guests').textContent   = data.total_attendees;
@@ -214,6 +233,17 @@
     a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
     a.download = 'rsvps.csv';
     a.click();
+  }
+
+  function logout() {
+    currentSecret = '';
+    currentData = [];
+    document.getElementById('secret-input').value = '';
+    document.getElementById('login-err').textContent = '';
+    document.getElementById('login-wrap').style.display = 'block';
+    document.getElementById('admin-wrap').style.display = 'none';
+    document.getElementById('logout-btn').style.display = 'none';
+    window.location.href = '/';
   }
 </script>
 </body>
