@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>House Blessing — RSVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #faf6ef;
+      --warm:    #f0e8d8;
+      --gold:    #b8924a;
+      --gold-lt: #d4ac6a;
+      --brown:   #5c3d1e;
+      --text:    #3a2a16;
+      --muted:   #8a7060;
+      --white:   #fff;
+      --shadow:  rgba(90,55,20,0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background Pattern ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(184,146,74,.07) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(184,146,74,.07) 0%, transparent 45%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 72px 24px 56px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-ornament {
+      font-size: 28px;
+      color: var(--gold);
+      letter-spacing: .35em;
+      margin-bottom: 20px;
+      display: block;
+      opacity: 0;
+      animation: fadeDown .8s .1s forwards;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      line-height: 1.1;
+      color: var(--brown);
+      opacity: 0;
+      animation: fadeDown .9s .25s forwards;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-divider {
+      margin: 28px auto;
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0;
+      animation: fadeIn .8s .5s forwards;
+    }
+
+    .hero-details {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: var(--muted);
+      line-height: 1.9;
+      opacity: 0;
+      animation: fadeDown .9s .6s forwards;
+    }
+
+    .hero-details strong {
+      color: var(--brown);
+      font-weight: 600;
+    }
+
+    .hero-verse {
+      margin-top: 32px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--gold);
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeIn .9s .9s forwards;
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--white);
+      max-width: 560px;
+      margin: 0 auto 64px;
+      border-radius: 4px;
+      padding: 48px 40px;
+      box-shadow: 0 8px 48px var(--shadow), 0 1px 0 rgba(184,146,74,.2);
+      border-top: 3px solid var(--gold);
+      opacity: 0;
+      animation: fadeUp .9s 1s forwards;
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: var(--brown);
+      margin-bottom: 6px;
+    }
+
+    .card-sub {
+      font-size: .82rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    /* ── Form ── */
+    .field { margin-bottom: 22px; }
+
+    label {
+      display: block;
+      font-size: .78rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      border: 1px solid #ddd3c3;
+      border-radius: 3px;
+      padding: 11px 14px;
+      font-family: 'Jost', sans-serif;
+      font-size: .95rem;
+      color: var(--text);
+      background: var(--cream);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,146,74,.12);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* Attendee list */
+    .attendee-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .attendee-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeIn .35s forwards;
+    }
+
+    .attendee-row input { flex: 1; }
+
+    .btn-remove {
+      width: 34px; height: 34px;
+      border: 1px solid #ddd3c3;
+      background: var(--cream);
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--muted);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-remove:hover { border-color: #c0392b; color: #c0392b; }
+
+    .btn-add {
+      margin-top: 10px;
+      background: none;
+      border: 1px dashed var(--gold-lt);
+      color: var(--gold);
+      padding: 9px 16px;
+      font-family: 'Jost', sans-serif;
+      font-size: .85rem;
+      letter-spacing: .06em;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+      width: 100%;
+    }
+    .btn-add:hover { background: rgba(184,146,74,.07); border-color: var(--gold); }
+
+    /* Submit */
+    .btn-submit {
+      margin-top: 32px;
+      width: 100%;
+      padding: 15px;
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      border-radius: 3px;
+      font-family: 'Jost', sans-serif;
+      font-size: .9rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      position: relative;
+    }
+    .btn-submit:hover:not(:disabled) { background: var(--brown); }
+    .btn-submit:active:not(:disabled) { transform: scale(.98); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+    .btn-submit .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+    }
+    .btn-submit.loading .spinner { display: block; }
+
+    /* Feedback */
+    .msg {
+      display: none;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 3px;
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+    .msg.success { background: #f0faf3; border: 1px solid #a8d5b5; color: #2d6a4f; }
+    .msg.error   { background: #fff4f4; border: 1px solid #f5c6c6; color: #922b21; }
+    .msg.show    { display: block; }
+
+    /* ── Counter ── */
+    .counter {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 560px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+      opacity: 0;
+      animation: fadeIn .8s 1.3s forwards;
+    }
+
+    .counter-inner {
+      display: inline-flex;
+      gap: 40px;
+      background: var(--white);
+      border: 1px solid rgba(184,146,74,.25);
+      border-radius: 4px;
+      padding: 24px 48px;
+      box-shadow: 0 2px 16px var(--shadow);
+    }
+
+    .counter-item { text-align: center; }
+
+    .counter-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .counter-label {
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 0 24px 48px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    /* ── Success Screen ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+    }
+    .success-screen.show { display: block; }
+    .success-icon { font-size: 3rem; margin-bottom: 16px; }
+    .success-screen h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem;
+      font-weight: 300;
+      color: var(--brown);
+      margin-bottom: 10px;
+    }
+    .success-screen p { color: var(--muted); font-size: .95rem; line-height: 1.7; }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes spin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    @media (max-width: 500px) {
+      .card { padding: 36px 24px; }
+      .counter-inner { padding: 20px 28px; gap: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <span class="hero-ornament">✦ &nbsp; ✦ &nbsp; ✦</span>
+    <h1>You're Invited to Our<br><em>House Blessing</em></h1>
+    <div class="hero-divider"></div>
+    <div class="hero-details">
+      <strong>Sunday, May 31, 2026</strong><br>
+      5:00 in the afternoon<br>
+      <strong>Blk 17, Lot 1 Phase 2 Metropolis Subdivision, Brgy. San Gabriel, San Pablo City, Laguna</strong>
+    </div>
+    <div class="hero-verse">
+      "Unless the Lord builds the house,<br>
+      the builders labor in vain."<br>
+      — Psalm 127:1
+    </div>
+  </section>
+
+  <!-- RSVP Card -->
+  <div class="card" id="rsvp-card">
+    <div class="form-view">
+      <div class="card-title">Kindly Confirm Your Attendance</div>
+      <div class="card-sub">Please fill in by May 28, 2026</div>
+
+      <div class="field">
+        <label for="family-name">Family / Group Name</label>
+        <input type="text" id="family-name" placeholder="e.g. The Santos Family" maxlength="80" />
+      </div>
+
+      <div class="field">
+        <label>Names of Attendees</label>
+        <div class="attendee-list" id="attendee-list"></div>
+        <button class="btn-add" id="btn-add-attendee">+ Add Another Guest</button>
+      </div>
+
+      <div class="field">
+        <label for="message">Message for the Family <span style="color:var(--muted);font-size:.8em">(optional)</span></label>
+        <textarea id="message" placeholder="A warm note or prayer for our new home…"></textarea>
+      </div>
+
+      <button class="btn-submit" id="btn-submit">
+        Confirm Attendance
+        <span class="spinner"></span>
+      </button>
+
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon">🏡</div>
+      <h2>See you on the 31st!</h2>
+      <p>Thank you for confirming. We look forward to celebrating this blessing with you and your family.</p>
+      <div style="margin-top:24px;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);font-size:1.05rem;">
+        With love &amp; gratitude ✦
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Counter -->
+  <div class="counter">
+    <div class="counter-inner">
+      <div class="counter-item">
+        <div class="counter-num" id="cnt-families">—</div>
+        <div class="counter-label">Families</div>
+      </div>
+      <div class="counter-item">
+        <div class="counter-num" id="cnt-guests">—</div>
+        <div class="counter-label">Guests</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>With joy we open our doors — come celebrate with us.</footer>
+
+  <script>
+    // ── Attendee rows ───────────────────────────────────────────────────────
+    const list = document.getElementById('attendee-list');
+
+    function addRow(val = '') {
+      const row = document.createElement('div');
+      row.className = 'attendee-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Full name" maxlength="60" value="${val}" />
+        <button class="btn-remove" title="Remove">✕</button>
+      `;
+      row.querySelector('.btn-remove').addEventListener('click', () => {
+        if (list.children.length > 1) row.remove();
+      });
+      list.appendChild(row);
+    }
+
+    addRow(); // start with one
+    document.getElementById('btn-add-attendee').addEventListener('click', () => addRow());
+
+    // ── Submit ───────────────────────────────────────────────────────────────
+    const btn    = document.getElementById('btn-submit');
+    const msgBox = document.getElementById('msg');
+
+    function showMsg(text, type) {
+      msgBox.textContent = text;
+      msgBox.className = `msg ${type} show`;
+    }
+
+    btn.addEventListener('click', async () => {
+      const familyName = document.getElementById('family-name').value.trim();
+      const attendees  = [...list.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
+      const message    = document.getElementById('message').value.trim();
+
+      if (!familyName) return showMsg('Please enter your family or group name.', 'error');
+      if (attendees.length === 0) return showMsg('Please add at least one attendee name.', 'error');
+
+      btn.disabled = true;
+      btn.classList.add('loading');
+      msgBox.className = 'msg';
+
+      try {
+        const res = await fetch('/api/rsvp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ family_name: familyName, attendees, message })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          document.querySelector('.form-view').style.display = 'none';
+          document.getElementById('success-screen').classList.add('show');
+          loadSummary();
+        } else {
+          showMsg(data.error || 'Something went wrong. Please try again.', 'error');
+          btn.disabled = false;
+          btn.classList.remove('loading');
+        }
+      } catch {
+        showMsg('Network error. Please check your connection and try again.', 'error');
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    });
+
+    // ── Summary counter ──────────────────────────────────────────────────────
+    async function loadSummary() {
+      try {
+        const res  = await fetch('/api/summary');
+        const data = await res.json();
+        animateNum('cnt-families', data.families);
+        animateNum('cnt-guests',   data.total);
+      } catch { /* silent */ }
+    }
+
+    function animateNum(id, target) {
+      const el = document.getElementById(id);
+      let cur = 0;
+      const step = Math.max(1, Math.ceil(target / 30));
+      const timer = setInterval(() => {
+        cur = Math.min(cur + step, target);
+        el.textContent = cur;
+        if (cur >= target) clearInterval(timer);
+      }, 30);
+    }
+
+    loadSummary();
+  </script>
+</body>
+</html>
